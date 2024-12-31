@@ -1,18 +1,22 @@
-/*
- * matrix.c - Simple "Matrix" screen effect for a VT100/VT220-like terminal
- *            under 2.11BSD (K&R style), with signal handling.
- *
- * Compile example (on 2.11BSD):
- *    cc -o matrix matrix.c
- *
- * Run it, then press Ctrl-C to exit (SIGINT).
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
-#include <unistd.h>   /* might need to replace usleep() if 2.11BSD lacks it */
+
+#define MAX_TRAILS 16
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 24
+
+/* Structure to represent a trail */
+struct Trail {
+    int column;      /* Column where the trail is active */
+    int rows_drawn;  /* Number of rows drawn so far */
+    int length;      /* Length of the trail */
+    int active;      /* Whether this trail is active */
+};
+
+struct Trail trails[MAX_TRAILS];
+int trail_timer = 0;
 
 /* Signal handler to restore the cursor and reset scrolling region */
 void restore_on_exit(signum)
@@ -29,56 +33,103 @@ int signum;
     exit(0);
 }
 
+void initialize_trails()
+{
+    int i;
+    for (i = 0; i < MAX_TRAILS; i++) {
+        trails[i].active = 0;
+    }
+}
+
+void start_new_trail(length)
+int length;
+{
+    int i;
+    for (i = 0; i < MAX_TRAILS; i++) {
+        if (!trails[i].active) {
+            trails[i].column = rand() % SCREEN_WIDTH;
+            trails[i].rows_drawn = 0; /* Start with no rows drawn */
+            trails[i].length = length;
+            trails[i].active = 1;
+            break;
+        }
+    }
+}
+
+void update_trails()
+{
+    int i;
+    char c;
+
+    for (i = 0; i < MAX_TRAILS; i++) {
+        if (trails[i].active) {
+            /* Draw only in the first row if the trail is active */
+            if (trails[i].rows_drawn < trails[i].length) {
+                printf("\033[1;%dH", trails[i].column + 1);
+                c = '!' + (rand() % 94);
+                putchar(c);
+
+                /* Increment the number of rows drawn */
+                trails[i].rows_drawn++;
+
+                /* Deactivate and recycle the trail if fully drawn */
+                if (trails[i].rows_drawn >= trails[i].length) {
+                    trails[i].active = 0;
+                }
+            }
+        }
+    }
+
+    /* Scroll the screen down by one row */
+    printf("\033M");
+}
+
 int main()
 {
-    int col;
-    char c;
+    int trail_length = 5; /* Configurable length of the trail */
+    int spawn_rate = 1;   /* Configurable spawn rate */
 
     /* Seed the random generator */
     srand(time((long *)0));
 
     /* Install signal handlers */
-    (void) signal(SIGINT, restore_on_exit);  /* For Ctrl-C */
-    (void) signal(SIGTERM, restore_on_exit); /* If you want to handle SIGTERM too */
+    signal(SIGINT, restore_on_exit);
+    signal(SIGTERM, restore_on_exit);
 
     /* Hide the cursor */
     printf("\033[?25l");
 
-    /* Set scrolling region to full screen (1..24).
-       Adjust if your terminal has more (or fewer) lines. */
+    /* Set scrolling region to full screen */
     printf("\033[1;24r");
 
-    /* Clear screen once at the beginning (optional) */
+    /* Clear screen */
     printf("\033[2J");
 
+    /* Initialize trails */
+    initialize_trails();
+
     for (;;) {
-        /* Pick a random column in [0..79] */
-        col = rand() % 80;
+        /* Start a new trail periodically */
+        if (trail_timer % spawn_rate == 0) {
+            start_new_trail(trail_length);
+        }
 
-        /* Pick a random printable ASCII char from '!'..'~' (94 chars) */
-        c = '!' + (rand() % 94);
+        /* Update and draw trails */
+        update_trails();
 
-        /* Move cursor to top row, (col+1) in 1-based column indexing */
-        printf("\033[1;%dH", col + 1);
-
-        /* Print the random character */
-        putchar(c);
-
-        /* Move cursor back to top-left (just to be sure) */
+        /* Reset cursor to top-left (optional) */
         printf("\033[1;1H");
 
-        /* Issue Reverse Index to scroll entire screen down by 1 line */
-        printf("\033M");
-
-        /* Flush output so it shows up now */
+        /* Flush output */
         fflush(stdout);
 
-        /* Small delay: 50ms. Adjust to taste. */
+        /* Small delay */
         usleep(50000);
+
+        trail_timer++;
     }
 
-    /* Normally never reached, but just in case */
+    /* Normally never reached */
     restore_on_exit(0);
-
     return 0;
 }

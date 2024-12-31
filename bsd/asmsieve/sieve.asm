@@ -152,13 +152,13 @@ SIEVE_LOOP:
         mov     r3, r4          / First multiple will be r3 + r3
         add     r3, r4          / Adjust r4 to start at r3 + r3
 MARKLOOP:
+        add     r3, r4          / Add prime to get next multiple
+        cmp     r4, $LIMIT     / Check if we've exceeded limit
+        bge     NEXT_ODD       / Exit if exceeded
         mov     r4, -(sp)       / Save current multiple
         jsr     pc, SETCMP
         add     $2., sp
-        add     r3, r4          / Add prime to get next multiple
-        cmp     r4, $LIMIT     / Check if we've exceeded limit
-        blt     MARKLOOP       / If not, continue marking
-    / If not, continue marking
+        br      MARKLOOP       / Continue marking
 
 NEXT_ODD:
         add     $2., r3
@@ -235,6 +235,11 @@ DONE_PRINT:
         add     $4., sp
 
         / ...compute elapsed if desired...
+
+        / Print blank line
+        mov     $EMPTYMSG, -(sp)
+        jsr     pc, _puts
+        add     $2., sp
 
         / Finally exit
         jsr     pc, _exit
