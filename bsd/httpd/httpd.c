@@ -1,4 +1,14 @@
-/* 2.11BSD httpd */
+/*
+ * httpd.c-   A simple HTTP server for 2.11BSD
+ *
+ *  Compile example (on 2.11BSD, might need -lm for math library):
+ *    make
+ *
+ *  Source: https://github.com/AaronJackson/2.11BSDhttpd
+ *  License: MIT License
+ * 
+ */
+
 #include <sys/types.h>
 #include <sys/file.h>
 #include <sys/socket.h>

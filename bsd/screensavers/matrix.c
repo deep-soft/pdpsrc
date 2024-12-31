@@ -1,3 +1,19 @@
+/* 
+ * matrix.c - Draws a matrix-like rain of characters on the screen.
+ *            then scroll the screen down (VT100 Reverse Index).
+ *            Written in K&R style for 2.11BSD, etc.
+ *
+ *  Compile example (on 2.11BSD, might need -lm for math library):
+ *    cc -o matrix matrix.c -lm
+ *
+ *  Press Ctrl-C to exit (SIGINT), which restores the cursor and
+ *  resets the scrolling region.
+ * 
+ *  Author: Dave Plummer, 2024. 
+ *  License: GPL 2.0
+ * 
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>

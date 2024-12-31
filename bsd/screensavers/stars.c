@@ -1,3 +1,19 @@
+/*
+ * stars.c - Simple blinking stars screensaver for the VT100 terminal.
+ *            Written in K&R style for 2.11BSD, etc.
+ *
+ *  Compile example (on 2.11BSD, might need -lm for math library):
+ *    cc -o stars stars.c -lm
+ *
+ *  Press Ctrl-C to exit (SIGINT), which restores the cursor and
+ *  resets the scrolling region.
+ * 
+ *  Author: Dave Plummer, 2024. 
+ *  License: GPL 2.0
+ * 
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
