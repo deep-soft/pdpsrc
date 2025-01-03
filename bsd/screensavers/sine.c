@@ -34,7 +34,7 @@ int main()
 
     /* Initialize angles and steps for each sine wave */
     for (i = 0; i < NUMSINES; i++) {
-        angles[i] = i * (M_PI / NUMSINES); /* Phase shift for each sine wave */
+        angles[i] = 1.5 * i * (M_PI / NUMSINES); /* Phase shift for each sine wave */
         angle_steps[i] = 0.1;             /* Fixed step size */
     }
 
