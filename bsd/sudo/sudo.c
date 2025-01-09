@@ -25,12 +25,16 @@
 #include <string.h>
 #include <errno.h>
 
-static void usage(const char *progname) {
+static void usage(progname) 
+char *progname;
+{
     fprintf(stderr, "Usage: %s [-u <user>] <command> [args...]\n", progname);
     exit(1);
 }
 
-int main(int argc, char *argv[])
+int main(argc, argv[])
+int argc;
+char *argv[];
 {
     struct passwd *pwd_cur;   /* user invoking sudo */
     struct passwd *pwd_tgt;   /* target user (defaults to root) */
