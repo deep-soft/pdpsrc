@@ -77,21 +77,23 @@ void update_trails()
     int i;
     char c;
 
-    for (i = 0; i < MAX_TRAILS; i++) {
-        if (trails[i].active) {
+    for (i = 0; i < MAX_TRAILS; i++) 
+    {
+        if (trails[i].active) 
+        {
             /* Draw only in the first row if the trail is active */
-            if (trails[i].rows_drawn < trails[i].length) {
+            if (trails[i].rows_drawn < trails[i].length) 
+            {
                 printf("\033[1;%dH", trails[i].column + 1);
                 c = '!' + (rand() % 94);
                 putchar(c);
 
                 /* Increment the number of rows drawn */
                 trails[i].rows_drawn++;
-
-                /* Deactivate and recycle the trail if fully drawn */
-                if (trails[i].rows_drawn >= trails[i].length) {
-                    trails[i].active = 0;
-                }
+            }
+            else
+            {       
+                trails[i].active = 0;
             }
         }
     }
@@ -102,7 +104,7 @@ void update_trails()
 
 int main()
 {
-    int trail_length = 5; /* Configurable length of the trail */
+    int trail_length = 8; /* Configurable length of the trail */
     int spawn_rate = 1;   /* Configurable spawn rate */
 
     /* Seed the random generator */
@@ -140,7 +142,6 @@ int main()
         fflush(stdout);
 
         /* Small delay */
-        usleep(50000);
 
         trail_timer++;
     }
