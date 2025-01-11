@@ -20,7 +20,7 @@
 #define MQTT_TOPIC       "pdp11/cpu_usage"
 #define CLIENT_ID        "PDP11Client"
 #define USERNAME         "MQTT"
-#define PASSWORD         "Smone2326"
+#define PASSWORD         "Password"
 
 /* Define uint8_t for older C standards (if not already defined) */
 /* Uncomment if necessary
