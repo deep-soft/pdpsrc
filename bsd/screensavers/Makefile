@@ -6,7 +6,7 @@ LDFLAGS =
 LIBS = -lm
 
 # Program names
-PROGRAMS = stars matrix sine
+PROGRAMS = stars matrix sine matrix2
 
 # Default target
 all: $(PROGRAMS)
@@ -16,6 +16,9 @@ stars: stars.c
 	$(CC) $(CFLAGS) -o stars stars.c $(LDFLAGS) $(LIBS)
 
 matrix: matrix.c
+	$(CC) $(CFLAGS) -o matrix matrix.c $(LDFLAGS) $(LIBS)
+
+matrix2: matrix2.c
 	$(CC) $(CFLAGS) -o matrix matrix.c $(LDFLAGS) $(LIBS)
 
 sine: sine.c
