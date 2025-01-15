@@ -122,7 +122,6 @@ int main()
             /* Delay after moving each star */
             /* usleep(30000); */
         }
-        usleep(100000);
     }
 
     /* Cleanup (won't reach here due to infinite loop) */

@@ -86,7 +86,6 @@ int main()
         copy_grid(next_grid, current_grid);
 
         /* Small delay: 200ms. Adjust to taste. */
-        usleep(200000);
     }
 
     /* Normally never reached, but just in case */
@@ -99,7 +98,7 @@ int main()
 void initialize_grid(int current[HEIGHT][WIDTH])
 {
     int row, col;
-    srand((unsigned int) time(NULL));
+    srand(0);
 
     for (row = 0; row < HEIGHT; row++) {
         for (col = 0; col < WIDTH; col++) {
