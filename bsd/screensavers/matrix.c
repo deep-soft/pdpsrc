@@ -23,6 +23,19 @@
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 24
 
+
+/*
+** Strings to load a VT220 softfont providing the extra Matrix characters, select it and unselect it.
+** This softfont contains 46 mirrored katakana as ASCII !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMN
+** The real term is a Dynamically Replaceable Character Sets (DRCS) loaded into the terminal's
+** memory using a Down-Line-Loading DRCS (DECDLD) control string. The font is built using Sixels.
+** Font design by Philippe Majerus, January 2025
+*/
+#define LOAD_MATRIX_SOFTFONT "\033P1;1;2{ MMQAyAAA\?/\?\?\?\?@A\?\?;\?ACwGOO\?/\?\?\?B\?\?\?\?;{CCECC[\?/\?@AAA\?\?\?;\?CC{CC\?\?/AAABAAA\?;CC}ScCC\?/\?\?B\?\?@A\?;{CCC}CC\?/@AAA\?@A\?;_gg}gg_\?/\?\?\?B\?\?\?\?;{CCCCMO\?/\?@AAA\?\?\?;CC{CCMO\?/\?\?\?@AA\?\?;{CCCCCC\?/BAAAAAA\?;C}CCC]C\?/\?\?@AAA\?\?;]_\?\?SSS\?/\?\?@AAAA\?;EIqaAAA\?/A@\?\?@AA\?;KSCCC}C\?/AAAAA@\?\?;Mo\?\?\?WE\?/\?\?@AAAA\?;{csSCMO\?/\?@AAAA\?\?;OQQ{SSO\?/\?\?\?@A\?\?\?;]_\?M\?\?M\?/\?\?@AAAA\?;GIIyIIG\?/\?\?\?@A\?\?\?;OOGG}\?\?\?/\?\?\?\?B\?\?\?;GGG}GGG\?/\?\?\?@AA\?\?;\?CCCCC\?\?/AAAAAAA\?;MQaQAAA\?/A@\?@AA\?\?;CkSecCC\?/@\?\?B\?@@\?;Mo\?\?\?\?\?\?/\?\?@@AAA\?;\?wC\?[_\?\?/B\?\?\?\?@A\?;CCCGGG}\?/AAAAAA@\?;]aAAAAA\?/\?\?@AAA\?\?;\?_OGCGO\?/@\?\?\?\?\?\?\?;CsC}CsC\?/@\?\?BA\?@\?;EIQaaQA\?/\?\?A@\?\?\?\?;CSQIII\?\?/AAA@@@@\?;\?o\?EW_\?\?/B@@AABA\?;MO_OG\?\?\?/A@\?@AAA\?;OQQQ}QO\?/AAAA@\?\?\?;WgGG}GG\?/\?\?@\?B\?\?\?;\?\?{CCC\?\?/AABAAAA\?;}QQQQQQ\?/BAAAAAA\?;WiIIIIG\?/\?\?@AAA\?\?;}\?\?\?\?\?]\?/\?@AAAA\?\?;_\?}\?\?}\?\?/\?@B\?\?@A\?;O_\?\?\?\?}\?/\?\?@@AAB\?;}AAAAA}\?/BAAAAAB\?;]aAAAAM\?/\?\?@AAA\?\?;]iIIIII\?/\?\?@AAA\?\?;]_\?\?CCC\?/\?\?@AAAA\?\033\\"
+#define SELECT_MATRIX_SOFTFONT "\033( M"
+#define UNSELECT_SOFTFONT "\033(B"
+
+
 /* Structure to represent a trail */
 struct Trail {
     int column;      /* Column where the trail is active */
@@ -39,9 +52,9 @@ void restore_on_exit(signum)
 int signum;
 {
     /* Show the cursor again */
-    printf("\033[?25h");
+    puts("\033[?25h");
     /* Reset scrolling region to the entire screen (1..24 or as needed) */
-    printf("\033[1;24r");
+    puts("\033[1;24r");
     /* Optionally clear screen or any other cleanup */
     fflush(stdout);
 
@@ -85,9 +98,15 @@ void update_trails()
             if (trails[i].rows_drawn < trails[i].length) 
             {
                 printf("\033[1;%dH", trails[i].column + 1);
-                c = '!' + (rand() % 94);
-                putchar(c);
-
+                c = (rand() % (46));
+                {
+                    // Mirrored Katakana character
+                    c = c + '!';
+                    printf(SELECT_MATRIX_SOFTFONT);
+                    putchar(c);
+                    printf(UNSELECT_SOFTFONT);
+                }
+                
                 /* Increment the number of rows drawn */
                 trails[i].rows_drawn++;
             }
@@ -107,6 +126,8 @@ int main()
     int trail_length = 8; /* Configurable length of the trail */
     int spawn_rate = 1;   /* Configurable spawn rate */
 
+    puts("Starting!");
+
     /* Seed the random generator */
     srand(time((long *)0));
 
@@ -115,13 +136,17 @@ int main()
     signal(SIGTERM, restore_on_exit);
 
     /* Hide the cursor */
-    printf("\033[?25l");
+    puts("\033[?25l");
+
 
     /* Set scrolling region to full screen */
-    printf("\033[1;24r");
+    puts("\033[1;24r");
+
+    /* Load Matrix softfont */
+    puts(LOAD_MATRIX_SOFTFONT);
 
     /* Clear screen */
-    printf("\033[2J");
+    puts("\033[2J");
 
     /* Initialize trails */
     initialize_trails();
@@ -136,7 +161,7 @@ int main()
         update_trails();
 
         /* Reset cursor to top-left (optional) */
-        printf("\033[1;1H");
+        puts("\033[1;1H");
 
         /* Flush output */
         fflush(stdout);
